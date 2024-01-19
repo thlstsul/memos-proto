@@ -1,4 +1,4 @@
-# Guide
+# Guide v0.18.2
 
 ## Prerequisites
 
