@@ -1,8 +1,8 @@
-# Guide v0.19.0
+# Guide v0.20.1
 
 ## Prerequisites
 
-- Install [buf](https://docs.buf.build/installation)
+- [buf](https://docs.buf.build/installation)
 
 ## Generate
 
