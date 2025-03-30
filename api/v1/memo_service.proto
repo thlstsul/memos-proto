@@ -4,7 +4,6 @@ package memos.api.v1;
 
 import "api/v1/common.proto";
 import "api/v1/markdown_service.proto";
-import "api/v1/memo_relation_service.proto";
 import "api/v1/reaction_service.proto";
 import "api/v1/resource_service.proto";
 import "google/api/annotations.proto";
@@ -21,22 +20,20 @@ service MemoService {
   rpc CreateMemo(CreateMemoRequest) returns (Memo) {
     option (google.api.http) = {
       post: "/api/v1/memos"
-      body: "*"
+      body: "memo"
     };
   }
   // ListMemos lists memos with pagination and filter.
   rpc ListMemos(ListMemosRequest) returns (ListMemosResponse) {
-    option (google.api.http) = {get: "/api/v1/memos"};
+    option (google.api.http) = {
+      get: "/api/v1/memos"
+      additional_bindings: {get: "/api/v1/{parent=users/*}/memos"}
+    };
   }
   // GetMemo gets a memo.
   rpc GetMemo(GetMemoRequest) returns (Memo) {
     option (google.api.http) = {get: "/api/v1/{name=memos/*}"};
     option (google.api.method_signature) = "name";
-  }
-  // GetMemoByUid gets a memo by uid
-  rpc GetMemoByUid(GetMemoByUidRequest) returns (Memo) {
-    option (google.api.http) = {get: "/api/v1/memos:by-uid/{uid}"};
-    option (google.api.method_signature) = "uid";
   }
   // UpdateMemo updates a memo.
   rpc UpdateMemo(UpdateMemoRequest) returns (Memo) {
@@ -50,21 +47,6 @@ service MemoService {
   rpc DeleteMemo(DeleteMemoRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {delete: "/api/v1/{name=memos/*}"};
     option (google.api.method_signature) = "name";
-  }
-  // ListMemoProperties lists memo properties.
-  rpc ListMemoProperties(ListMemoPropertiesRequest) returns (ListMemoPropertiesResponse) {
-    option (google.api.http) = {get: "/api/v1/{name=memos/*}/properties"};
-  }
-  // RebuildMemoProperty rebuilds a memo property.
-  rpc RebuildMemoProperty(RebuildMemoPropertyRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/api/v1/{name=memos/*}/properties:rebuild"
-      body: "*"
-    };
-  }
-  // ListMemoTags lists tags for a memo.
-  rpc ListMemoTags(ListMemoTagsRequest) returns (ListMemoTagsResponse) {
-    option (google.api.http) = {get: "/api/v1/{parent=memos/*}/tags"};
   }
   // RenameMemoTag renames a tag for a memo.
   rpc RenameMemoTag(RenameMemoTagRequest) returns (google.protobuf.Empty) {
@@ -131,8 +113,8 @@ service MemoService {
   }
   // DeleteMemoReaction deletes a reaction for a memo.
   rpc DeleteMemoReaction(DeleteMemoReactionRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {delete: "/api/v1/reactions/{reaction_id}"};
-    option (google.api.method_signature) = "reaction_id";
+    option (google.api.http) = {delete: "/api/v1/reactions/{id}"};
+    option (google.api.method_signature) = "id";
   }
 }
 
@@ -144,18 +126,19 @@ enum Visibility {
 }
 
 message Memo {
+  reserved 2;
+
   // The name of the memo.
-  // Format: memos/{id}
-  // id is the system generated id.
-  string name = 1;
+  // Format: memos/{memo}, memo is the user defined id or uuid.
+  string name = 1 [
+    (google.api.field_behavior) = OUTPUT_ONLY,
+    (google.api.field_behavior) = IDENTIFIER
+  ];
 
-  // The user defined id of the memo.
-  string uid = 2;
-
-  RowStatus row_status = 3;
+  State state = 3;
 
   // The name of the creator.
-  // Format: users/{id}
+  // Format: users/{user}
   string creator = 4;
 
   google.protobuf.Timestamp create_time = 5;
@@ -170,56 +153,78 @@ message Memo {
 
   Visibility visibility = 10;
 
-  repeated string tags = 11;
+  repeated string tags = 11 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   bool pinned = 12;
 
-  optional int32 parent_id = 13 [
-    deprecated = true,
-    (google.api.field_behavior) = OUTPUT_ONLY
-  ];
+  repeated Resource resources = 14;
 
-  repeated Resource resources = 14 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-  repeated MemoRelation relations = 15 [(google.api.field_behavior) = OUTPUT_ONLY];
+  repeated MemoRelation relations = 15;
 
   repeated Reaction reactions = 16 [(google.api.field_behavior) = OUTPUT_ONLY];
 
-  MemoProperty property = 17 [(google.api.field_behavior) = OUTPUT_ONLY];
+  Property property = 17 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The name of the parent memo.
   // Format: memos/{id}
   optional string parent = 18 [(google.api.field_behavior) = OUTPUT_ONLY];
 
   // The snippet of the memo content. Plain text only.
-  string snippet = 19;
+  string snippet = 19 [(google.api.field_behavior) = OUTPUT_ONLY];
+
+  // The location of the memo.
+  optional Location location = 20;
+
+  message Property {
+    bool has_link = 1;
+    bool has_task_list = 2;
+    bool has_code = 3;
+    bool has_incomplete_tasks = 4;
+  }
 }
 
-message MemoProperty {
-  repeated string tags = 1;
-  bool has_link = 2;
-  bool has_task_list = 3;
-  bool has_code = 4;
-  bool has_incomplete_tasks = 5;
+message Location {
+  string placeholder = 1;
+  double latitude = 2;
+  double longitude = 3;
 }
 
 message CreateMemoRequest {
-  string content = 1;
-
-  Visibility visibility = 2;
+  // The memo to create.
+  Memo memo = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message ListMemosRequest {
+  // The parent is the owner of the memos.
+  // If not specified or `users/-`, it will list all memos.
+  string parent = 1;
+
   // The maximum number of memos to return.
-  int32 page_size = 1;
+  int32 page_size = 2;
 
   // A page token, received from a previous `ListMemos` call.
   // Provide this to retrieve the subsequent page.
-  string page_token = 2;
+  string page_token = 3;
 
-  // Filter is used to filter memos returned in the list.
-  // Format: "creator == 'users/{uid}' && visibilities == ['PUBLIC', 'PROTECTED']"
-  string filter = 3;
+  // The state of the memos to list.
+  // Default to `NORMAL`. Set to `ARCHIVED` to list archived memos.
+  State state = 4;
+
+  // What field to sort the results by.
+  // Default to display_time.
+  string sort = 5;
+
+  // The direction to sort the results by.
+  // Default to DESC.
+  Direction direction = 6;
+
+  // Filter is a CEL expression to filter memos.
+  // Refer to `Shortcut.filter`.
+  string filter = 7;
+
+  // [Deprecated] Old filter contains some specific conditions to filter memos.
+  // Format: "creator == 'users/{user}' && visibilities == ['PUBLIC', 'PROTECTED']"
+  string old_filter = 8;
 }
 
 message ListMemosResponse {
@@ -232,68 +237,20 @@ message ListMemosResponse {
 
 message GetMemoRequest {
   // The name of the memo.
-  // Format: memos/{id}
   string name = 1;
 }
 
-message GetMemoByUidRequest {
-  // The uid of the memo.
-  string uid = 1;
-}
-
 message UpdateMemoRequest {
-  Memo memo = 1;
+  // The memo to update.
+  // The `name` field is required.
+  Memo memo = 1 [(google.api.field_behavior) = REQUIRED];
 
   google.protobuf.FieldMask update_mask = 2;
 }
 
 message DeleteMemoRequest {
   // The name of the memo.
-  // Format: memos/{id}
   string name = 1;
-}
-
-message ListMemoPropertiesRequest {
-  // The name of the memo.
-  // Format: memos/{id}. Use "memos/-" to list all properties.
-  string name = 1;
-}
-
-message ListMemoPropertiesResponse {
-  repeated MemoPropertyEntity entities = 1;
-}
-
-message MemoPropertyEntity {
-  // The name of the memo property.
-  // Format: memos/{id}/properties/{property_id}
-  string name = 1;
-
-  MemoProperty property = 2 [(google.api.field_behavior) = OUTPUT_ONLY];
-
-  google.protobuf.Timestamp display_time = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
-}
-
-message RebuildMemoPropertyRequest {
-  // The name of the memo.
-  // Format: memos/{id}. Use "memos/-" to rebuild all memos.
-  string name = 1;
-}
-
-message ListMemoTagsRequest {
-  // The parent, who owns the tags.
-  // Format: memos/{id}. Use "memos/-" to list all tags.
-  string parent = 1;
-
-  // Filter is used to filter memos.
-  // Format: "creator == 'users/{uid}' && visibilities == ['PUBLIC', 'PROTECTED']"
-  string filter = 2;
-}
-
-message ListMemoTagsResponse {
-  // tag_amounts is the amount of tags.
-  // key is the tag name. e.g. "tag1".
-  // value is the amount of the tag.
-  map<string, int32> tag_amounts = 1;
 }
 
 message RenameMemoTagRequest {
@@ -314,7 +271,6 @@ message DeleteMemoTagRequest {
 
 message SetMemoResourcesRequest {
   // The name of the memo.
-  // Format: memos/{id}
   string name = 1;
 
   repeated Resource resources = 2;
@@ -322,7 +278,6 @@ message SetMemoResourcesRequest {
 
 message ListMemoResourcesRequest {
   // The name of the memo.
-  // Format: memos/{id}
   string name = 1;
 }
 
@@ -330,9 +285,30 @@ message ListMemoResourcesResponse {
   repeated Resource resources = 1;
 }
 
+message MemoRelation {
+  Memo memo = 1;
+
+  Memo related_memo = 2;
+
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    REFERENCE = 1;
+    COMMENT = 2;
+  }
+  Type type = 3;
+
+  message Memo {
+    // The name of the memo.
+    // Format: memos/{id}
+    string name = 1;
+    string uid = 2;
+    // The snippet of the memo content. Plain text only.
+    string snippet = 3 [(google.api.field_behavior) = OUTPUT_ONLY];
+  }
+}
+
 message SetMemoRelationsRequest {
   // The name of the memo.
-  // Format: memos/{id}
   string name = 1;
 
   repeated MemoRelation relations = 2;
@@ -340,7 +316,6 @@ message SetMemoRelationsRequest {
 
 message ListMemoRelationsRequest {
   // The name of the memo.
-  // Format: memos/{id}
   string name = 1;
 }
 
@@ -350,15 +325,14 @@ message ListMemoRelationsResponse {
 
 message CreateMemoCommentRequest {
   // The name of the memo.
-  // Format: memos/{id}
   string name = 1;
 
-  CreateMemoRequest comment = 2;
+  // The comment to create.
+  Memo comment = 2;
 }
 
 message ListMemoCommentsRequest {
   // The name of the memo.
-  // Format: memos/{id}
   string name = 1;
 }
 
@@ -368,7 +342,6 @@ message ListMemoCommentsResponse {
 
 message ListMemoReactionsRequest {
   // The name of the memo.
-  // Format: memos/{id}
   string name = 1;
 }
 
@@ -378,12 +351,13 @@ message ListMemoReactionsResponse {
 
 message UpsertMemoReactionRequest {
   // The name of the memo.
-  // Format: memos/{id}
   string name = 1;
 
   Reaction reaction = 2;
 }
 
 message DeleteMemoReactionRequest {
-  int32 reaction_id = 1;
+  // The id of the reaction.
+  // Refer to the `Reaction.id`.
+  int32 id = 1;
 }

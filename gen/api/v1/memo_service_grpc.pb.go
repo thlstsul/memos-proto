@@ -20,26 +20,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MemoService_CreateMemo_FullMethodName          = "/memos.api.v1.MemoService/CreateMemo"
-	MemoService_ListMemos_FullMethodName           = "/memos.api.v1.MemoService/ListMemos"
-	MemoService_GetMemo_FullMethodName             = "/memos.api.v1.MemoService/GetMemo"
-	MemoService_GetMemoByUid_FullMethodName        = "/memos.api.v1.MemoService/GetMemoByUid"
-	MemoService_UpdateMemo_FullMethodName          = "/memos.api.v1.MemoService/UpdateMemo"
-	MemoService_DeleteMemo_FullMethodName          = "/memos.api.v1.MemoService/DeleteMemo"
-	MemoService_ListMemoProperties_FullMethodName  = "/memos.api.v1.MemoService/ListMemoProperties"
-	MemoService_RebuildMemoProperty_FullMethodName = "/memos.api.v1.MemoService/RebuildMemoProperty"
-	MemoService_ListMemoTags_FullMethodName        = "/memos.api.v1.MemoService/ListMemoTags"
-	MemoService_RenameMemoTag_FullMethodName       = "/memos.api.v1.MemoService/RenameMemoTag"
-	MemoService_DeleteMemoTag_FullMethodName       = "/memos.api.v1.MemoService/DeleteMemoTag"
-	MemoService_SetMemoResources_FullMethodName    = "/memos.api.v1.MemoService/SetMemoResources"
-	MemoService_ListMemoResources_FullMethodName   = "/memos.api.v1.MemoService/ListMemoResources"
-	MemoService_SetMemoRelations_FullMethodName    = "/memos.api.v1.MemoService/SetMemoRelations"
-	MemoService_ListMemoRelations_FullMethodName   = "/memos.api.v1.MemoService/ListMemoRelations"
-	MemoService_CreateMemoComment_FullMethodName   = "/memos.api.v1.MemoService/CreateMemoComment"
-	MemoService_ListMemoComments_FullMethodName    = "/memos.api.v1.MemoService/ListMemoComments"
-	MemoService_ListMemoReactions_FullMethodName   = "/memos.api.v1.MemoService/ListMemoReactions"
-	MemoService_UpsertMemoReaction_FullMethodName  = "/memos.api.v1.MemoService/UpsertMemoReaction"
-	MemoService_DeleteMemoReaction_FullMethodName  = "/memos.api.v1.MemoService/DeleteMemoReaction"
+	MemoService_CreateMemo_FullMethodName         = "/memos.api.v1.MemoService/CreateMemo"
+	MemoService_ListMemos_FullMethodName          = "/memos.api.v1.MemoService/ListMemos"
+	MemoService_GetMemo_FullMethodName            = "/memos.api.v1.MemoService/GetMemo"
+	MemoService_UpdateMemo_FullMethodName         = "/memos.api.v1.MemoService/UpdateMemo"
+	MemoService_DeleteMemo_FullMethodName         = "/memos.api.v1.MemoService/DeleteMemo"
+	MemoService_RenameMemoTag_FullMethodName      = "/memos.api.v1.MemoService/RenameMemoTag"
+	MemoService_DeleteMemoTag_FullMethodName      = "/memos.api.v1.MemoService/DeleteMemoTag"
+	MemoService_SetMemoResources_FullMethodName   = "/memos.api.v1.MemoService/SetMemoResources"
+	MemoService_ListMemoResources_FullMethodName  = "/memos.api.v1.MemoService/ListMemoResources"
+	MemoService_SetMemoRelations_FullMethodName   = "/memos.api.v1.MemoService/SetMemoRelations"
+	MemoService_ListMemoRelations_FullMethodName  = "/memos.api.v1.MemoService/ListMemoRelations"
+	MemoService_CreateMemoComment_FullMethodName  = "/memos.api.v1.MemoService/CreateMemoComment"
+	MemoService_ListMemoComments_FullMethodName   = "/memos.api.v1.MemoService/ListMemoComments"
+	MemoService_ListMemoReactions_FullMethodName  = "/memos.api.v1.MemoService/ListMemoReactions"
+	MemoService_UpsertMemoReaction_FullMethodName = "/memos.api.v1.MemoService/UpsertMemoReaction"
+	MemoService_DeleteMemoReaction_FullMethodName = "/memos.api.v1.MemoService/DeleteMemoReaction"
 )
 
 // MemoServiceClient is the client API for MemoService service.
@@ -52,18 +48,10 @@ type MemoServiceClient interface {
 	ListMemos(ctx context.Context, in *ListMemosRequest, opts ...grpc.CallOption) (*ListMemosResponse, error)
 	// GetMemo gets a memo.
 	GetMemo(ctx context.Context, in *GetMemoRequest, opts ...grpc.CallOption) (*Memo, error)
-	// GetMemoByUid gets a memo by uid
-	GetMemoByUid(ctx context.Context, in *GetMemoByUidRequest, opts ...grpc.CallOption) (*Memo, error)
 	// UpdateMemo updates a memo.
 	UpdateMemo(ctx context.Context, in *UpdateMemoRequest, opts ...grpc.CallOption) (*Memo, error)
 	// DeleteMemo deletes a memo.
 	DeleteMemo(ctx context.Context, in *DeleteMemoRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListMemoProperties lists memo properties.
-	ListMemoProperties(ctx context.Context, in *ListMemoPropertiesRequest, opts ...grpc.CallOption) (*ListMemoPropertiesResponse, error)
-	// RebuildMemoProperty rebuilds a memo property.
-	RebuildMemoProperty(ctx context.Context, in *RebuildMemoPropertyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// ListMemoTags lists tags for a memo.
-	ListMemoTags(ctx context.Context, in *ListMemoTagsRequest, opts ...grpc.CallOption) (*ListMemoTagsResponse, error)
 	// RenameMemoTag renames a tag for a memo.
 	RenameMemoTag(ctx context.Context, in *RenameMemoTagRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// DeleteMemoTag deletes a tag for a memo.
@@ -126,16 +114,6 @@ func (c *memoServiceClient) GetMemo(ctx context.Context, in *GetMemoRequest, opt
 	return out, nil
 }
 
-func (c *memoServiceClient) GetMemoByUid(ctx context.Context, in *GetMemoByUidRequest, opts ...grpc.CallOption) (*Memo, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Memo)
-	err := c.cc.Invoke(ctx, MemoService_GetMemoByUid_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *memoServiceClient) UpdateMemo(ctx context.Context, in *UpdateMemoRequest, opts ...grpc.CallOption) (*Memo, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Memo)
@@ -150,36 +128,6 @@ func (c *memoServiceClient) DeleteMemo(ctx context.Context, in *DeleteMemoReques
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, MemoService_DeleteMemo_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *memoServiceClient) ListMemoProperties(ctx context.Context, in *ListMemoPropertiesRequest, opts ...grpc.CallOption) (*ListMemoPropertiesResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListMemoPropertiesResponse)
-	err := c.cc.Invoke(ctx, MemoService_ListMemoProperties_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *memoServiceClient) RebuildMemoProperty(ctx context.Context, in *RebuildMemoPropertyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, MemoService_RebuildMemoProperty_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *memoServiceClient) ListMemoTags(ctx context.Context, in *ListMemoTagsRequest, opts ...grpc.CallOption) (*ListMemoTagsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListMemoTagsResponse)
-	err := c.cc.Invoke(ctx, MemoService_ListMemoTags_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -306,18 +254,10 @@ type MemoServiceServer interface {
 	ListMemos(context.Context, *ListMemosRequest) (*ListMemosResponse, error)
 	// GetMemo gets a memo.
 	GetMemo(context.Context, *GetMemoRequest) (*Memo, error)
-	// GetMemoByUid gets a memo by uid
-	GetMemoByUid(context.Context, *GetMemoByUidRequest) (*Memo, error)
 	// UpdateMemo updates a memo.
 	UpdateMemo(context.Context, *UpdateMemoRequest) (*Memo, error)
 	// DeleteMemo deletes a memo.
 	DeleteMemo(context.Context, *DeleteMemoRequest) (*emptypb.Empty, error)
-	// ListMemoProperties lists memo properties.
-	ListMemoProperties(context.Context, *ListMemoPropertiesRequest) (*ListMemoPropertiesResponse, error)
-	// RebuildMemoProperty rebuilds a memo property.
-	RebuildMemoProperty(context.Context, *RebuildMemoPropertyRequest) (*emptypb.Empty, error)
-	// ListMemoTags lists tags for a memo.
-	ListMemoTags(context.Context, *ListMemoTagsRequest) (*ListMemoTagsResponse, error)
 	// RenameMemoTag renames a tag for a memo.
 	RenameMemoTag(context.Context, *RenameMemoTagRequest) (*emptypb.Empty, error)
 	// DeleteMemoTag deletes a tag for a memo.
@@ -359,23 +299,11 @@ func (UnimplementedMemoServiceServer) ListMemos(context.Context, *ListMemosReque
 func (UnimplementedMemoServiceServer) GetMemo(context.Context, *GetMemoRequest) (*Memo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMemo not implemented")
 }
-func (UnimplementedMemoServiceServer) GetMemoByUid(context.Context, *GetMemoByUidRequest) (*Memo, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetMemoByUid not implemented")
-}
 func (UnimplementedMemoServiceServer) UpdateMemo(context.Context, *UpdateMemoRequest) (*Memo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateMemo not implemented")
 }
 func (UnimplementedMemoServiceServer) DeleteMemo(context.Context, *DeleteMemoRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteMemo not implemented")
-}
-func (UnimplementedMemoServiceServer) ListMemoProperties(context.Context, *ListMemoPropertiesRequest) (*ListMemoPropertiesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListMemoProperties not implemented")
-}
-func (UnimplementedMemoServiceServer) RebuildMemoProperty(context.Context, *RebuildMemoPropertyRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RebuildMemoProperty not implemented")
-}
-func (UnimplementedMemoServiceServer) ListMemoTags(context.Context, *ListMemoTagsRequest) (*ListMemoTagsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListMemoTags not implemented")
 }
 func (UnimplementedMemoServiceServer) RenameMemoTag(context.Context, *RenameMemoTagRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RenameMemoTag not implemented")
@@ -485,24 +413,6 @@ func _MemoService_GetMemo_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MemoService_GetMemoByUid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetMemoByUidRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MemoServiceServer).GetMemoByUid(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MemoService_GetMemoByUid_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MemoServiceServer).GetMemoByUid(ctx, req.(*GetMemoByUidRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _MemoService_UpdateMemo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateMemoRequest)
 	if err := dec(in); err != nil {
@@ -535,60 +445,6 @@ func _MemoService_DeleteMemo_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MemoServiceServer).DeleteMemo(ctx, req.(*DeleteMemoRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MemoService_ListMemoProperties_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListMemoPropertiesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MemoServiceServer).ListMemoProperties(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MemoService_ListMemoProperties_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MemoServiceServer).ListMemoProperties(ctx, req.(*ListMemoPropertiesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MemoService_RebuildMemoProperty_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RebuildMemoPropertyRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MemoServiceServer).RebuildMemoProperty(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MemoService_RebuildMemoProperty_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MemoServiceServer).RebuildMemoProperty(ctx, req.(*RebuildMemoPropertyRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MemoService_ListMemoTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListMemoTagsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MemoServiceServer).ListMemoTags(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MemoService_ListMemoTags_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MemoServiceServer).ListMemoTags(ctx, req.(*ListMemoTagsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -811,28 +667,12 @@ var MemoService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _MemoService_GetMemo_Handler,
 		},
 		{
-			MethodName: "GetMemoByUid",
-			Handler:    _MemoService_GetMemoByUid_Handler,
-		},
-		{
 			MethodName: "UpdateMemo",
 			Handler:    _MemoService_UpdateMemo_Handler,
 		},
 		{
 			MethodName: "DeleteMemo",
 			Handler:    _MemoService_DeleteMemo_Handler,
-		},
-		{
-			MethodName: "ListMemoProperties",
-			Handler:    _MemoService_ListMemoProperties_Handler,
-		},
-		{
-			MethodName: "RebuildMemoProperty",
-			Handler:    _MemoService_RebuildMemoProperty_Handler,
-		},
-		{
-			MethodName: "ListMemoTags",
-			Handler:    _MemoService_ListMemoTags_Handler,
 		},
 		{
 			MethodName: "RenameMemoTag",
