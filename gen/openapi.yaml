@@ -624,18 +624,26 @@ paths:
             parameters:
                 - name: pageSize
                   in: query
-                  description: "Optional. The maximum number of memos to return.\r\n The service may return fewer than this value.\r\n If unspecified, at most 50 memos will be returned.\r\n The maximum value is 1000; values above 1000 will be coerced to 1000."
+                  description: |-
+                    Optional. The maximum number of memos to return.
+                     The service may return fewer than this value.
+                     If unspecified, at most 50 memos will be returned.
+                     The maximum value is 1000; values above 1000 will be coerced to 1000.
                   schema:
                     type: integer
                     format: int32
                 - name: pageToken
                   in: query
-                  description: "Optional. A page token, received from a previous `ListMemos` call.\r\n Provide this to retrieve the subsequent page."
+                  description: |-
+                    Optional. A page token, received from a previous `ListMemos` call.
+                     Provide this to retrieve the subsequent page.
                   schema:
                     type: string
                 - name: state
                   in: query
-                  description: "Optional. The state of the memos to list.\r\n Default to `NORMAL`. Set to `ARCHIVED` to list archived memos."
+                  description: |-
+                    Optional. The state of the memos to list.
+                     Default to `NORMAL`. Set to `ARCHIVED` to list archived memos.
                   schema:
                     enum:
                         - STATE_UNSPECIFIED
@@ -645,12 +653,18 @@ paths:
                     format: enum
                 - name: orderBy
                   in: query
-                  description: "Optional. The order to sort results by.\r\n Default to \"display_time desc\".\r\n Example: \"display_time desc\" or \"create_time asc\""
+                  description: |-
+                    Optional. The order to sort results by.
+                     Default to "display_time desc".
+                     Example: "display_time desc" or "create_time asc"
                   schema:
                     type: string
                 - name: filter
                   in: query
-                  description: "Optional. Filter to apply to the list results.\r\n Filter is a CEL expression to filter memos.\r\n Refer to `Shortcut.filter`."
+                  description: |-
+                    Optional. Filter to apply to the list results.
+                     Filter is a CEL expression to filter memos.
+                     Refer to `Shortcut.filter`.
                   schema:
                     type: string
                 - name: showDeleted
@@ -679,7 +693,9 @@ paths:
             parameters:
                 - name: memoId
                   in: query
-                  description: "Optional. The memo ID to use for this memo.\r\n If empty, a unique ID will be generated."
+                  description: |-
+                    Optional. The memo ID to use for this memo.
+                     If empty, a unique ID will be generated.
                   schema:
                     type: string
                 - name: validateOnly
@@ -726,7 +742,9 @@ paths:
                     type: string
                 - name: readMask
                   in: query
-                  description: "Optional. The fields to return in the response.\r\n If not specified, all fields are returned."
+                  description: |-
+                    Optional. The fields to return in the response.
+                     If not specified, all fields are returned.
                   schema:
                     type: string
                     format: field-mask
@@ -1088,36 +1106,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/memos/{memo}/tags/{tag}:
-        delete:
+    /api/v1/memos/{memo}/tags:delete:
+        post:
             tags:
                 - MemoService
             description: DeleteMemoTag deletes a tag for a memo.
             operationId: MemoService_DeleteMemoTag
             parameters:
-                - name: tag
-                  in: path
-                  description: Required. The tag name to delete.
-                  required: true
-                  schema:
-                    type: string
                 - name: memo
                   in: path
                   description: The memo id.
                   required: true
                   schema:
                     type: string
-                - name: tag
-                  in: path
-                  description: The tag id.
-                  required: true
-                  schema:
-                    type: string
-                - name: deleteRelatedMemos
-                  in: query
-                  description: Optional. Whether to delete related memos.
-                  schema:
-                    type: boolean
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DeleteMemoTagRequest'
+                required: true
             responses:
                 "200":
                     description: OK
@@ -1211,13 +1218,6 @@ paths:
                      Example: "state=ACTIVE" or "role=USER" or "email:@example.com"
                      Supported operators: =, !=, <, <=, >, >=, :
                      Supported fields: username, email, role, state, create_time, update_time
-                  schema:
-                    type: string
-                - name: orderBy
-                  in: query
-                  description: |-
-                    Optional. The order to sort results by.
-                     Example: "create_time desc" or "username asc"
                   schema:
                     type: string
                 - name: showDeleted
@@ -1626,6 +1626,124 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/v1/users/{user}/settings:
+        get:
+            tags:
+                - UserService
+            description: ListUserSettings returns a list of user settings.
+            operationId: UserService_ListUserSettings
+            parameters:
+                - name: user
+                  in: path
+                  description: The user id.
+                  required: true
+                  schema:
+                    type: string
+                - name: pageSize
+                  in: query
+                  description: |-
+                    Optional. The maximum number of settings to return.
+                     The service may return fewer than this value.
+                     If unspecified, at most 50 settings will be returned.
+                     The maximum value is 1000; values above 1000 will be coerced to 1000.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  description: |-
+                    Optional. A page token, received from a previous `ListUserSettings` call.
+                     Provide this to retrieve the subsequent page.
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListUserSettingsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/v1/users/{user}/settings/{setting}:
+        get:
+            tags:
+                - UserService
+            description: GetUserSetting returns the user setting.
+            operationId: UserService_GetUserSetting
+            parameters:
+                - name: user
+                  in: path
+                  description: The user id.
+                  required: true
+                  schema:
+                    type: string
+                - name: setting
+                  in: path
+                  description: The setting id.
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UserSetting'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+        patch:
+            tags:
+                - UserService
+            description: UpdateUserSetting updates the user setting.
+            operationId: UserService_UpdateUserSetting
+            parameters:
+                - name: user
+                  in: path
+                  description: The user id.
+                  required: true
+                  schema:
+                    type: string
+                - name: setting
+                  in: path
+                  description: The setting id.
+                  required: true
+                  schema:
+                    type: string
+                - name: updateMask
+                  in: query
+                  description: Required. The list of fields to update.
+                  schema:
+                    type: string
+                    format: field-mask
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UserSetting'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UserSetting'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/v1/users/{user}/shortcuts:
         get:
             tags:
@@ -1794,9 +1912,9 @@ paths:
     /api/v1/users/{user}/webhooks:
         get:
             tags:
-                - WebhookService
-            description: ListWebhooks returns a list of webhooks for a user.
-            operationId: WebhookService_ListWebhooks
+                - UserService
+            description: ListUserWebhooks returns a list of webhooks for a user.
+            operationId: UserService_ListUserWebhooks
             parameters:
                 - name: user
                   in: path
@@ -1810,7 +1928,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListWebhooksResponse'
+                                $ref: '#/components/schemas/ListUserWebhooksResponse'
                 default:
                     description: Default error response
                     content:
@@ -1819,9 +1937,9 @@ paths:
                                 $ref: '#/components/schemas/Status'
         post:
             tags:
-                - WebhookService
-            description: CreateWebhook creates a new webhook for a user.
-            operationId: WebhookService_CreateWebhook
+                - UserService
+            description: CreateUserWebhook creates a new webhook for a user.
+            operationId: UserService_CreateUserWebhook
             parameters:
                 - name: user
                   in: path
@@ -1829,16 +1947,11 @@ paths:
                   required: true
                   schema:
                     type: string
-                - name: validateOnly
-                  in: query
-                  description: Optional. If set, validate the request, but do not actually create the webhook.
-                  schema:
-                    type: boolean
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Webhook'
+                            $ref: '#/components/schemas/UserWebhook'
                 required: true
             responses:
                 "200":
@@ -1846,7 +1959,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Webhook'
+                                $ref: '#/components/schemas/UserWebhook'
                 default:
                     description: Default error response
                     content:
@@ -1854,42 +1967,11 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Status'
     /api/v1/users/{user}/webhooks/{webhook}:
-        get:
-            tags:
-                - WebhookService
-            description: GetWebhook gets a webhook by name.
-            operationId: WebhookService_GetWebhook
-            parameters:
-                - name: user
-                  in: path
-                  description: The user id.
-                  required: true
-                  schema:
-                    type: string
-                - name: webhook
-                  in: path
-                  description: The webhook id.
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Webhook'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
         delete:
             tags:
-                - WebhookService
-            description: DeleteWebhook deletes a webhook for a user.
-            operationId: WebhookService_DeleteWebhook
+                - UserService
+            description: DeleteUserWebhook deletes a webhook for a user.
+            operationId: UserService_DeleteUserWebhook
             parameters:
                 - name: user
                   in: path
@@ -1915,9 +1997,9 @@ paths:
                                 $ref: '#/components/schemas/Status'
         patch:
             tags:
-                - WebhookService
-            description: UpdateWebhook updates a webhook for a user.
-            operationId: WebhookService_UpdateWebhook
+                - UserService
+            description: UpdateUserWebhook updates an existing webhook for a user.
+            operationId: UserService_UpdateUserWebhook
             parameters:
                 - name: user
                   in: path
@@ -1933,7 +2015,7 @@ paths:
                     type: string
                 - name: updateMask
                   in: query
-                  description: Optional. The list of fields to update.
+                  description: The list of fields to update.
                   schema:
                     type: string
                     format: field-mask
@@ -1941,7 +2023,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Webhook'
+                            $ref: '#/components/schemas/UserWebhook'
                 required: true
             responses:
                 "200":
@@ -1949,33 +2031,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Webhook'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/users/{user}:getSetting:
-        get:
-            tags:
-                - UserService
-            description: GetUserSetting returns the user setting.
-            operationId: UserService_GetUserSetting
-            parameters:
-                - name: user
-                  in: path
-                  description: The user id.
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/UserSetting'
+                                $ref: '#/components/schemas/UserWebhook'
                 default:
                     description: Default error response
                     content:
@@ -2008,98 +2064,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
-    /api/v1/users/{user}:updateSetting:
-        patch:
-            tags:
-                - UserService
-            description: UpdateUserSetting updates the user setting.
-            operationId: UserService_UpdateUserSetting
-            parameters:
-                - name: user
-                  in: path
-                  description: The user id.
-                  required: true
-                  schema:
-                    type: string
-                - name: updateMask
-                  in: query
-                  description: Required. The list of fields to update.
-                  schema:
-                    type: string
-                    format: field-mask
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/UserSetting'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/UserSetting'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
-    /api/v1/users:search:
-        get:
-            tags:
-                - UserService
-            description: SearchUsers searches for users based on query.
-            operationId: UserService_SearchUsers
-            parameters:
-                - name: query
-                  in: query
-                  description: Required. The search query.
-                  schema:
-                    type: string
-                - name: pageSize
-                  in: query
-                  description: Optional. The maximum number of users to return.
-                  schema:
-                    type: integer
-                    format: int32
-                - name: pageToken
-                  in: query
-                  description: Optional. A page token for pagination.
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/SearchUsersResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
     /api/v1/users:stats:
         get:
             tags:
                 - UserService
             description: ListAllUserStats returns statistics for all users.
             operationId: UserService_ListAllUserStats
-            parameters:
-                - name: pageSize
-                  in: query
-                  description: Optional. The maximum number of user stats to return.
-                  schema:
-                    type: integer
-                    format: int32
-                - name: pageToken
-                  in: query
-                  description: Optional. A page token for pagination.
-                  schema:
-                    type: string
             responses:
                 "200":
                     description: OK
@@ -2443,6 +2413,23 @@ components:
                         Last time the session was accessed.
                          Used for sliding expiration calculation (last_accessed_time + 2 weeks).
                     format: date-time
+        DeleteMemoTagRequest:
+            required:
+                - parent
+                - tag
+            type: object
+            properties:
+                parent:
+                    type: string
+                    description: |-
+                        Required. The parent, who owns the tags.
+                         Format: memos/{memo}. Use "memos/-" to delete all tags.
+                tag:
+                    type: string
+                    description: Required. The tag name to delete.
+                deleteRelatedMemos:
+                    type: boolean
+                    description: Optional. Whether to delete related memos.
         EmbeddedContentNode:
             type: object
             properties:
@@ -2468,6 +2455,18 @@ components:
                     type: string
                 avatarUrl:
                     type: string
+        GeneralSetting_CustomProfile:
+            type: object
+            properties:
+                title:
+                    type: string
+                description:
+                    type: string
+                logoUrl:
+                    type: string
+                locale:
+                    type: string
+            description: Custom profile configuration for workspace branding.
         GetCurrentSessionResponse:
             type: object
             properties:
@@ -2496,6 +2495,12 @@ components:
                     type: object
                     additionalProperties:
                         type: string
+                children:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Node'
+                isSelfClosing:
+                    type: boolean
         HeadingNode:
             type: object
             properties:
@@ -2653,18 +2658,11 @@ components:
         ListAllUserStatsResponse:
             type: object
             properties:
-                userStats:
+                stats:
                     type: array
                     items:
                         $ref: '#/components/schemas/UserStats'
                     description: The list of user statistics.
-                nextPageToken:
-                    type: string
-                    description: A token for the next page of results.
-                totalSize:
-                    type: integer
-                    description: The total count of user statistics.
-                    format: int32
         ListAttachmentsResponse:
             type: object
             properties:
@@ -2777,7 +2775,9 @@ components:
                     description: The list of memos.
                 nextPageToken:
                     type: string
-                    description: "A token that can be sent as `page_token` to retrieve the next page.\r\n If this field is omitted, there are no subsequent pages."
+                    description: |-
+                        A token that can be sent as `page_token` to retrieve the next page.
+                         If this field is omitted, there are no subsequent pages.
                 totalSize:
                     type: integer
                     description: The total count of memos (may be approximate).
@@ -2831,6 +2831,32 @@ components:
                     items:
                         $ref: '#/components/schemas/UserSession'
                     description: The list of user sessions.
+        ListUserSettingsResponse:
+            type: object
+            properties:
+                settings:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserSetting'
+                    description: The list of user settings.
+                nextPageToken:
+                    type: string
+                    description: |-
+                        A token that can be sent as `page_token` to retrieve the next page.
+                         If this field is omitted, there are no subsequent pages.
+                totalSize:
+                    type: integer
+                    description: The total count of settings (may be approximate).
+                    format: int32
+            description: Response message for ListUserSettings method.
+        ListUserWebhooksResponse:
+            type: object
+            properties:
+                webhooks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserWebhook'
+                    description: The list of webhooks.
         ListUsersResponse:
             type: object
             properties:
@@ -2848,14 +2874,6 @@ components:
                     type: integer
                     description: The total count of users (may be approximate).
                     format: int32
-        ListWebhooksResponse:
-            type: object
-            properties:
-                webhooks:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/Webhook'
-                    description: The list of webhooks.
         Location:
             type: object
             properties:
@@ -2889,7 +2907,9 @@ components:
             properties:
                 name:
                     type: string
-                    description: "The resource name of the memo.\r\n Format: memos/{memo}, memo is the user defined id or uuid."
+                    description: |-
+                        The resource name of the memo.
+                         Format: memos/{memo}, memo is the user defined id or uuid.
                 state:
                     enum:
                         - STATE_UNSPECIFIED
@@ -2901,7 +2921,9 @@ components:
                 creator:
                     readOnly: true
                     type: string
-                    description: "The name of the creator.\r\n Format: users/{user}"
+                    description: |-
+                        The name of the creator.
+                         Format: users/{user}
                 createTime:
                     readOnly: true
                     type: string
@@ -2967,7 +2989,9 @@ components:
                 parent:
                     readOnly: true
                     type: string
-                    description: "Output only. The name of the parent memo.\r\n Format: memos/{memo}"
+                    description: |-
+                        Output only. The name of the parent memo.
+                         Format: memos/{memo}
                 snippet:
                     readOnly: true
                     type: string
@@ -3005,7 +3029,9 @@ components:
             properties:
                 name:
                     type: string
-                    description: "The resource name of the memo.\r\n Format: memos/{memo}"
+                    description: |-
+                        The resource name of the memo.
+                         Format: memos/{memo}
                 snippet:
                     readOnly: true
                     type: string
@@ -3191,14 +3217,21 @@ components:
                 name:
                     readOnly: true
                     type: string
-                    description: "The resource name of the reaction.\r\n Format: reactions/{reaction}"
+                    description: |-
+                        The resource name of the reaction.
+                         Format: reactions/{reaction}
                 creator:
                     readOnly: true
                     type: string
-                    description: "The resource name of the creator.\r\n Format: users/{user}"
+                    description: |-
+                        The resource name of the creator.
+                         Format: users/{user}
                 contentId:
                     type: string
-                    description: "The resource name of the content.\r\n For memo reactions, this should be the memo's resource name.\r\n Format: memos/{memo}"
+                    description: |-
+                        The resource name of the content.
+                         For memo reactions, this should be the memo's resource name.
+                         Format: memos/{memo}
                 reactionType:
                     type: string
                     description: "Required. The type of reaction (e.g., \"\U0001F44D\", \"❤️\", \"\U0001F604\")."
@@ -3225,7 +3258,9 @@ components:
             properties:
                 parent:
                     type: string
-                    description: "Required. The parent, who owns the tags.\r\n Format: memos/{memo}. Use \"memos/-\" to rename all tags."
+                    description: |-
+                        Required. The parent, who owns the tags.
+                         Format: memos/{memo}. Use "memos/-" to rename all tags.
                 oldTag:
                     type: string
                     description: Required. The old tag name to rename.
@@ -3248,21 +3283,6 @@ components:
                 markdown:
                     type: string
                     description: The restored markdown content.
-        SearchUsersResponse:
-            type: object
-            properties:
-                users:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/User'
-                    description: The list of users matching the search query.
-                nextPageToken:
-                    type: string
-                    description: A token for the next page of results.
-                totalSize:
-                    type: integer
-                    description: The total count of matching users.
-                    format: int32
         SetMemoAttachmentsRequest:
             required:
                 - name
@@ -3271,7 +3291,9 @@ components:
             properties:
                 name:
                     type: string
-                    description: "Required. The resource name of the memo.\r\n Format: memos/{memo}"
+                    description: |-
+                        Required. The resource name of the memo.
+                         Format: memos/{memo}
                 attachments:
                     type: array
                     items:
@@ -3285,7 +3307,9 @@ components:
             properties:
                 name:
                     type: string
-                    description: "Required. The resource name of the memo.\r\n Format: memos/{memo}"
+                    description: |-
+                        Required. The resource name of the memo.
+                         Format: memos/{memo}
                 relations:
                     type: array
                     items:
@@ -3328,6 +3352,24 @@ components:
                         $ref: '#/components/schemas/GoogleProtobufAny'
                     description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
             description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        StorageSetting_S3Config:
+            type: object
+            properties:
+                accessKeyId:
+                    type: string
+                accessKeySecret:
+                    type: string
+                endpoint:
+                    type: string
+                region:
+                    type: string
+                bucket:
+                    type: string
+                usePathStyle:
+                    type: boolean
+            description: |-
+                S3 configuration for cloud storage backend.
+                 Reference: https://developers.cloudflare.com/r2/examples/aws/aws-sdk-go/
         StrikethroughNode:
             type: object
             properties:
@@ -3425,7 +3467,9 @@ components:
             properties:
                 name:
                     type: string
-                    description: "Required. The resource name of the memo.\r\n Format: memos/{memo}"
+                    description: |-
+                        Required. The resource name of the memo.
+                         Format: memos/{memo}
                 reaction:
                     allOf:
                         - $ref: '#/components/schemas/Reaction'
@@ -3566,14 +3610,33 @@ components:
                 name:
                     type: string
                     description: |-
-                        The resource name of the user whose setting this is.
-                         Format: users/{user}
+                        The name of the user setting.
+                         Format: users/{user}/settings/{setting}, {setting} is the key for the setting.
+                         For example, "users/123/settings/GENERAL" for general settings.
+                generalSetting:
+                    $ref: '#/components/schemas/UserSetting_GeneralSetting'
+                sessionsSetting:
+                    $ref: '#/components/schemas/UserSetting_SessionsSetting'
+                accessTokensSetting:
+                    $ref: '#/components/schemas/UserSetting_AccessTokensSetting'
+                webhooksSetting:
+                    $ref: '#/components/schemas/UserSetting_WebhooksSetting'
+            description: User settings message
+        UserSetting_AccessTokensSetting:
+            type: object
+            properties:
+                accessTokens:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserAccessToken'
+                    description: List of user access tokens.
+            description: User access tokens configuration.
+        UserSetting_GeneralSetting:
+            type: object
+            properties:
                 locale:
                     type: string
                     description: The preferred locale of the user.
-                appearance:
-                    type: string
-                    description: The preferred appearance of the user.
                 memoVisibility:
                     type: string
                     description: The default visibility of the memo.
@@ -3583,7 +3646,25 @@ components:
                         The preferred theme of the user.
                          This references a CSS file in the web/public/themes/ directory.
                          If not set, the default theme will be used.
-            description: User settings message
+            description: General user settings configuration.
+        UserSetting_SessionsSetting:
+            type: object
+            properties:
+                sessions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserSession'
+                    description: List of active user sessions.
+            description: User authentication sessions configuration.
+        UserSetting_WebhooksSetting:
+            type: object
+            properties:
+                webhooks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserWebhook'
+                    description: List of user webhooks.
+            description: User webhooks configuration.
         UserStats:
             type: object
             properties:
@@ -3634,42 +3715,72 @@ components:
                     type: integer
                     format: int32
             description: Memo type statistics.
-        Webhook:
-            required:
-                - displayName
-                - url
+        UserWebhook:
             type: object
             properties:
                 name:
                     type: string
                     description: |-
-                        The resource name of the webhook.
+                        The name of the webhook.
                          Format: users/{user}/webhooks/{webhook}
-                displayName:
-                    type: string
-                    description: The display name of the webhook.
                 url:
                     type: string
-                    description: The target URL for the webhook.
-        WorkspaceCustomProfile:
+                    description: The URL to send the webhook to.
+                displayName:
+                    type: string
+                    description: Optional. Human-readable name for the webhook.
+                createTime:
+                    readOnly: true
+                    type: string
+                    description: The creation time of the webhook.
+                    format: date-time
+                updateTime:
+                    readOnly: true
+                    type: string
+                    description: The last update time of the webhook.
+                    format: date-time
+            description: UserWebhook represents a webhook owned by a user.
+        WorkspaceProfile:
             type: object
             properties:
-                title:
+                owner:
                     type: string
-                description:
+                    description: |-
+                        The name of instance owner.
+                         Format: users/{user}
+                version:
                     type: string
-                logoUrl:
+                    description: Version is the current version of instance.
+                mode:
                     type: string
-                locale:
+                    description: Mode is the instance mode (e.g. "prod", "dev" or "demo").
+                instanceUrl:
                     type: string
-                appearance:
+                    description: Instance URL is the URL of the instance.
+            description: Workspace profile message containing basic workspace information.
+        WorkspaceSetting:
+            type: object
+            properties:
+                name:
                     type: string
-        WorkspaceGeneralSetting:
+                    description: |-
+                        The name of the workspace setting.
+                         Format: workspace/settings/{setting}
+                generalSetting:
+                    $ref: '#/components/schemas/WorkspaceSetting_GeneralSetting'
+                storageSetting:
+                    $ref: '#/components/schemas/WorkspaceSetting_StorageSetting'
+                memoRelatedSetting:
+                    $ref: '#/components/schemas/WorkspaceSetting_MemoRelatedSetting'
+            description: A workspace setting resource.
+        WorkspaceSetting_GeneralSetting:
             type: object
             properties:
                 theme:
                     type: string
-                    description: "theme is the name of the selected theme.\r\n This references a CSS file in the web/public/themes/ directory."
+                    description: |-
+                        theme is the name of the selected theme.
+                         This references a CSS file in the web/public/themes/ directory.
                 disallowUserRegistration:
                     type: boolean
                     description: disallow_user_registration disallows user registration.
@@ -3684,11 +3795,14 @@ components:
                     description: additional_style is the additional style.
                 customProfile:
                     allOf:
-                        - $ref: '#/components/schemas/WorkspaceCustomProfile'
+                        - $ref: '#/components/schemas/GeneralSetting_CustomProfile'
                     description: custom_profile is the custom profile.
                 weekStartDayOffset:
                     type: integer
-                    description: "week_start_day_offset is the week start day offset from Sunday.\r\n 0: Sunday, 1: Monday, 2: Tuesday, 3: Wednesday, 4: Thursday, 5: Friday, 6: Saturday\r\n Default is Sunday."
+                    description: |-
+                        week_start_day_offset is the week start day offset from Sunday.
+                         0: Sunday, 1: Monday, 2: Tuesday, 3: Wednesday, 4: Thursday, 5: Friday, 6: Saturday
+                         Default is Sunday.
                     format: int32
                 disallowChangeUsername:
                     type: boolean
@@ -3696,7 +3810,8 @@ components:
                 disallowChangeNickname:
                     type: boolean
                     description: disallow_change_nickname disallows changing nickname.
-        WorkspaceMemoRelatedSetting:
+            description: General workspace settings configuration.
+        WorkspaceSetting_MemoRelatedSetting:
             type: object
             properties:
                 disallowPublicVisibility:
@@ -3715,9 +3830,6 @@ components:
                 enableLinkPreview:
                     type: boolean
                     description: enable_link_preview enables links preview.
-                enableComment:
-                    type: boolean
-                    description: enable_comment enables comment.
                 reactions:
                     type: array
                     items:
@@ -3734,36 +3846,8 @@ components:
                     items:
                         type: string
                     description: nsfw_tags is the list of tags that mark content as NSFW for blurring.
-        WorkspaceProfile:
-            type: object
-            properties:
-                owner:
-                    type: string
-                    description: "The name of instance owner.\r\n Format: users/{user}"
-                version:
-                    type: string
-                    description: Version is the current version of instance.
-                mode:
-                    type: string
-                    description: Mode is the instance mode (e.g. "prod", "dev" or "demo").
-                instanceUrl:
-                    type: string
-                    description: Instance URL is the URL of the instance.
-            description: Workspace profile message containing basic workspace information.
-        WorkspaceSetting:
-            type: object
-            properties:
-                name:
-                    type: string
-                    description: "The name of the workspace setting.\r\n Format: workspace/settings/{setting}"
-                generalSetting:
-                    $ref: '#/components/schemas/WorkspaceGeneralSetting'
-                storageSetting:
-                    $ref: '#/components/schemas/WorkspaceStorageSetting'
-                memoRelatedSetting:
-                    $ref: '#/components/schemas/WorkspaceMemoRelatedSetting'
-            description: A workspace setting resource.
-        WorkspaceStorageSetting:
+            description: Memo-related workspace settings and policies.
+        WorkspaceSetting_StorageSetting:
             type: object
             properties:
                 storageType:
@@ -3777,30 +3861,17 @@ components:
                     format: enum
                 filepathTemplate:
                     type: string
-                    description: "The template of file path.\r\n e.g. assets/{timestamp}_{filename}"
+                    description: |-
+                        The template of file path.
+                         e.g. assets/{timestamp}_{filename}
                 uploadSizeLimitMb:
                     type: string
                     description: The max upload size in megabytes.
                 s3Config:
                     allOf:
-                        - $ref: '#/components/schemas/WorkspaceStorageSetting_S3Config'
+                        - $ref: '#/components/schemas/StorageSetting_S3Config'
                     description: The S3 config.
-        WorkspaceStorageSetting_S3Config:
-            type: object
-            properties:
-                accessKeyId:
-                    type: string
-                accessKeySecret:
-                    type: string
-                endpoint:
-                    type: string
-                region:
-                    type: string
-                bucket:
-                    type: string
-                usePathStyle:
-                    type: boolean
-            description: 'Reference: https://developers.cloudflare.com/r2/examples/aws/aws-sdk-go/'
+            description: Storage configuration settings for workspace attachments.
 tags:
     - name: ActivityService
     - name: AttachmentService
@@ -3811,5 +3882,4 @@ tags:
     - name: MemoService
     - name: ShortcutService
     - name: UserService
-    - name: WebhookService
     - name: WorkspaceService
